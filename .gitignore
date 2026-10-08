@@ -15,3 +15,7 @@ venv/
 
 # App data
 memo.txt
+
+# Old
+app_old
+app2_old

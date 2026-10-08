@@ -51,7 +51,7 @@
             });
             const data = await response.json();
 
-            memoList.prepend(createMemoElement(`${data.memo}\n${data.timestamp}`));
+            memoList.prepend(createMemoElement(`${data.timestamp}\n${data.memo}`));
             memoInput.value = "";
         });
 

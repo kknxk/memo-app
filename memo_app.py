@@ -35,7 +35,7 @@ def save_memo_api():
 
     # メモをリストの先頭に追加
     memos = read_memos_from_file()
-    memos.insert(0, f"{new_memo.strip()}\n{timestamp}\n")
+    memos.insert(0, f"{timestamp}\n{new_memo.strip()}\n")
 
     # メモをファイルに保存
     with open("memo.txt", "w", encoding="utf-8") as file:
