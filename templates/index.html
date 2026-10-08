@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>メモ帳アプリ</title>
+</head>
+
+<body>
+    <h1>メモ帳アプリ</h1>
+
+    <textarea id="memo" placeholder="ここにメモを入力"></textarea>
+    <button id="saveButton">保存</button>
+
+    <hr>
+
+    <h2>保存されたメモ:</h2>
+
+    <div id="memoList"></div>
+
+    <script>
+        const memoInput = document.getElementById("memo");
+        const memoList = document.getElementById("memoList");
+        const saveButton = document.getElementById("saveButton");
+
+        function createMemoElement(content) {
+            const memoElement = document.createElement("p");
+            memoElement.className = "memo-content";
+            memoElement.textContent = content;
+            return memoElement;
+        }
+
+        async function loadMemos() {
+            const response = await fetch("/api/memos");
+            const data = await response.json();
+
+            memoList.innerHTML = "";
+            data.memos.forEach(memo => {
+                memoList.appendChild(createMemoElement(memo));
+            });
+        }
+
+        saveButton.addEventListener("click", async () => {
+            const response = await fetch("/api/memos", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ memo: memoInput.value })
+            });
+            const data = await response.json();
+
+            memoList.prepend(createMemoElement(`${data.memo}\n${data.timestamp}`));
+            memoInput.value = "";
+        });
+
+        loadMemos();
+    </script>
+
+</body>
+</html>

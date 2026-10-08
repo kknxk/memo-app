@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environment
+venvM/
+.venv/
+venv/
+
+# Environment / secrets
+.env
+
+# VS Code
+.vscode/
+
+# App data
+memo.txt
