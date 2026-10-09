@@ -24,10 +24,15 @@
         const memoList = document.getElementById("memoList");
         const saveButton = document.getElementById("saveButton");
 
-        function createMemoElement(content) {
+        function createMemoElement(memo) {
             const memoElement = document.createElement("p");
             memoElement.className = "memo-content";
-            memoElement.textContent = content;
+
+            memoElement.textContent =
+                `ID: ${memo.id}\n` +
+                `${memo.timestamp}\n` +
+                `${memo.memo}`;
+
             return memoElement;
         }
 
@@ -51,7 +56,7 @@
             });
             const data = await response.json();
 
-            memoList.prepend(createMemoElement(`${data.timestamp}\n${data.memo}`));
+            memoList.prepend(createMemoElement(data.memo));
             memoInput.value = "";
         });
 

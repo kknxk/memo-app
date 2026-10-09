@@ -1,12 +1,22 @@
 import datetime
-from flask import Flask, render_template, request, redirect, jsonify
+from flask import Flask, render_template, request, jsonify
+import json
 
 app = Flask(__name__)
 
 def read_memos_from_file():
-    with open("memo.txt", "r", encoding="utf-8-sig") as file:
-        memos = file.readlines()
+    with open("data/memo.json", "r", encoding="utf-8") as file:
+        memos = json.load(file)
     return memos
+
+def write_memos_to_file(memos):
+    with open("data/memo.json", "w", encoding="utf-8") as file:
+        json.dump(
+            memos,
+            file,
+            ensure_ascii=False,
+            indent=2
+        )
 
 
 @app.route("/")
@@ -18,36 +28,47 @@ def index():
 @app.route("/api/memos", methods=["GET"])
 def get_memos():
     memos = read_memos_from_file()
-    return {
+    return jsonify({
         "memos": memos
-    }
+    })
 
 @app.route("/api/memos", methods=["POST"])
 def save_memo_api():
 
     data = request.get_json()
-    print(data)  # デバッグ用に受信したデータを出力
     # 新しいメモを取得
     new_memo = data.get("memo")
-    print(f"Received memo: {new_memo}")  # デバッグ用に新しいメモを出力
+
+    if not new_memo or not new_memo.strip():
+        return jsonify({
+            "message": "メモを入力してください。"
+        }), 400
+
 
     timestamp= str(datetime.datetime.today())
-
     # メモをリストの先頭に追加
     memos = read_memos_from_file()
-    memos.insert(0, f"{timestamp}\n{new_memo.strip()}\n")
 
-    # メモをファイルに保存
-    with open("memo.txt", "w", encoding="utf-8") as file:
-        file.writelines(memos)
+    if memos:
+        new_id = max(memo["id"] for memo in memos) + 1
+    else:
+        new_id = 1
+
+    memo_data = {
+        "id": new_id,
+        "timestamp": timestamp,
+        "memo": new_memo.strip()
+    }
+
+    memos.insert(0, memo_data)
+
+    write_memos_to_file(memos)
+
     # JSON形式でレスポンスを返す
     return jsonify({
-        "status": "success",
         "message": "メモが保存されました。",
-        "memo": new_memo,
-        "timestamp": timestamp
-    })
-
+        "memo": memo_data
+    }), 201
 
 if __name__ == "__main__":
     app.run(debug=True)
